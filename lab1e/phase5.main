@@ -1,0 +1,130 @@
+: CLR gr2 and put -2 into gr3 clears gr3 - gr3 will be counter register to keep track of how many characters were inputted and gr2 stores the actual sum
+01011000
+10111000
+00000010
+01101100
+:Load bit pattern 0000001 into 	RCVCS by putting it into gr1
+01010100
+01110100
+:MOVT: put address of RCVCS into gr0
+10001000
+11111100
+11000101
+:MOVT put contents of RCVCS into gr1
+10010100
+:TST gr1 if it is negative 
+00001101
+:BNEG- if gr1 is negative, then branch to (16)... else busy wait
+00000101
+:Memory location of branch 
+00010000
+:Branch 
+00000100
+00001001
+#16
+:MOVT move character from RCVBUF into gr1
+10011000
+11111101
+10010101
+:Converts Hex characters to integers.. subtracts 48 from gr1 and stores result back into gr1
+10001000
+00110000
+00100100
+:add to gr2 (sum register) 
+00111001   
+:INC gr3 and TST gr 3 
+01111100
+00001111
+:BZ checks if gr3 zero.. if zero.. then branch to location.. (30 ) else busy wait once again and reload addresses from location 4
+00000111 
+00011110
+00000100
+00000100
+#30
+:Subtract 10 from gr2 to see if number is bigger than 9. If negative store space in gr2 and store number in gr3
+10111000
+00001010
+00101011
+00001110
+00000101
+:Jump to location 90 if less than 10.. else check if gr2 is 0 which means sum is equal to 10
+01011010
+:BZ and BPOZ.. If result is 0 or postive, then the sum must be at least 10. Jumps to location 102 if true.
+00000111
+01100110
+00000100
+01100110
+#41
+:At this point gr2 contains tens digit and gr3 contains ones digit
+01000100
+01001011
+:Put contents of gr2 (tens digit) into XMTBUF (#256)
+10011000
+11111111
+11010110
+:put bit pattern 00000000 into XMTCS
+01010100
+11000101
+:put contents of XMTCS in gr1 (#48)
+10010100
+:BNEG checks if gr1 is negative.. goes to #54 if negative 
+00001101
+00000101
+00110110
+00000100
+00110000
+#54
+:restart process for units digit in gr3
+01000100
+01001011
+:Put contents of gr3 (units digit)
+10011000
+11111111
+11010111
+:put bit pattern 00000000 into XMTCS
+01010100
+11000101
+:put contents of XMTCS in gr1
+10010100
+:BNEG checks if gr1 is negative. 
+00001101
+00000101
+01000110
+00000100
+00111101
+#70
+:HALT 
+00000000
+#75
+:put memory location of XMTCS (254) (#38)
+10001000
+11111110
+00001001
+#90
+:Adds 10 to restore to its original value
+10110010
+10101000
+00001010
+00111110
+:Converts it to ascii 
+10101000
+00110000
+00111110
+:puts space in gr2 and branches to 40
+10101000
+00100000
+00000100
+00101001
+#102
+:move result from gr2 to gr3 
+10110010
+:Put ascii code for 1 in gr2
+10101000
+00110001
+:change gr3 to ascii code - by putting 48 in gr1 and adding gr3 and gr1 and putting it back into gr3
+10011000
+00110000
+00111101
+:branch to location 40
+00000100
+00101001

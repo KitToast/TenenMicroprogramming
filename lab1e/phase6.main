@@ -1,0 +1,123 @@
+:Interrupt Vectors branches
+00000100
+00001010
+:Interrupt #1 : conclusion of a read request
+00000100
+01000000
+#8
+:Return code 
+00000100
+:First Instruction
+#10
+:gr1 to be address of RCVCS
+10011000
+11111100
+:gr2 to be the address of XMTCS
+10101000
+11111110
+: gr3 character to be outputted: starts with lower case character 'a'
+10111000
+01100001
+:Sets code for RCVCS
+10001000
+01000001
+11010100
+:Mem[gr2+1] <-gr3
+11101111
+00000001
+:start write cycle
+10001000
+00000000
+11100100
+:branch to 32
+00000100
+00100000
+#32
+:Loop that waits for XMT to be ready. This loop is what prints the characters from gr3. gr0 stores the value from XMTCS 
+10000110
+00001100
+00000101
+00110000
+:If buffer is ready, then output gr3 and go back to infinite loop
+00000100
+00100000
+#48
+:Mem[gr2+1] <-gr3
+11101111
+00000001
+:start write cycle
+10001000
+00000000
+11100100
+:Reloop back to the top loop
+00000100
+00100000
+#64
+:Interrupt Vector 
+: saves gr0 into location 201 to prevent loss of output from interrupt
+00000100
+11001000
+#66
+:branch to 80
+00000100
+01010000
+:Reads in input and puts in into gr0
+:gr0 <- Mem[gr1]
+:Tests gr0. If negative, go back to top loop
+#80
+:puts what is in RCVBUF into gr3-- gr3 <-Mem[gr2 +1]
+10111101
+00000001
+:branch to 100 for Captial Letter test
+00000100
+01100100
+#100
+:Tests for capital letters. 
+:put 61 into gr0. Subtract gr0 from gr3. If negative then, put 'A' into gr3. If zero or positive, put 'a' into gr3.
+10001000
+01100001
+:gr3 = gr3 -gr0
+00101100
+:TST gr3
+00001111
+00000101
+01111000
+00000100
+01111101
+#120
+:put 'A' into gr3
+10111000
+01000001
+00000100
+10001100
+#125
+:put 'a' into gr3
+10111000
+01100001
+00000100
+10001100
+#140
+:Sets code for RCVCS (resets reader)
+10001000
+01000001
+11010100
+:restores gr0 from Mem[201]
+:saves location in gr1 so we can access mem[201] again using register deffered addresssing
+10011000
+11001001
+10000101
+:restores the gr1 value 
+10011000
+11111100
+:returns to (pc=8)
+00000100
+00001000
+
+#200
+11001000
+00000000
+:branch to original location
+00000100
+01000010
+
+
